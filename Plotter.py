@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # method 'plot' which is called from the pathfind simulation.
 # takes a list of 3 part tuples holding the xyz values for each data point
 def plot(data):
-    print len(data)
+    print (len(data))
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')

@@ -15,7 +15,7 @@ import Plotter
 # after 'simulation_limit' simulations are run, display the data as a 3d graph using matplotlib
 # xyz axis = (goal
 
-# IF YOU ARE MORE INTERESTED IN THE DATA YOU CAN COMMENT OUT LINE 211 AND 236 (the call for display and the sleep timer)
+# IF YOU ARE MORE INTERESTED IN THE DATA YOU CAN COMMENT OUT THE LINE FOR DISPLAY AND SLEEP (the call for display and the sleep timer)
 # THIS MAKES THE PROGRAM RUN MUCH QUICKER BY DISABLING THE DISPLAY AND SLEEP
 
 # set up variables and pygame
@@ -54,6 +54,7 @@ def display():
                                               tile_size, tile_size))
     pygame.display.flip()
 
+
 # setting heuristics (estimate values) for each tile to give the ai a general idea of a direction
 def set_heuristics():
     goal_x = t.Tile.goal_tile.x
@@ -67,6 +68,9 @@ def set_heuristics():
         if tile != tile.start_tile:
             tile.adjust_color((0,   -100 * (float(tile.h) / (grid_height + grid_width)),
                                     -100 * (float(tile.h) / (grid_height + grid_width))))
+
+
+# Given a tile, returns a list of neighbors
 def neighbours(tile):
     neighbour_list = []
     if tile.x - 1 >= 0:
@@ -80,6 +84,8 @@ def neighbours(tile):
         neighbour_list.append(grid[tile.x, tile.y + 1])
     return neighbour_list
 
+
+# Checks the list of neighbors of the currently selected tile choosing the closest to the goal
 def pathfind():
     global current_tile
     global searching
@@ -113,18 +119,24 @@ def pathfind():
     if len(open_list) <= 0:
         searching = False
 
-    # choosing the lowest cost
-    lowest_f = open_list[0]
-    for tile in open_list:
-        if tile.f < lowest_f.f:
-            lowest_f = tile
+    # ensuring that there are available tiles to move to
+    # then choosing the lowest cost
+    if len(open_list) > 0:
+        lowest_f = open_list[0]
+        for tile in open_list:
+            if tile.f < lowest_f.f:
+                lowest_f = tile
 
-    # switching the selction to the lowest_f
-    open_list.remove(lowest_f)
-    closed_list.append(lowest_f)
-    lowest_f.set_color()
-    lowest_f.adjust_color((-100, -100, 100))
-    current_tile = lowest_f
+        # switching the selction to the lowest_f
+        open_list.remove(lowest_f)
+        closed_list.append(lowest_f)
+        lowest_f.set_color()
+        lowest_f.adjust_color((-100, -100, 100))
+        current_tile = lowest_f
+    # if the open_list is empty then we've run out of paths to reach
+    else:
+        print('NO PATH')
+
 
     # checking if the goal has been reached
     if current_tile.h == 0:
@@ -133,17 +145,19 @@ def pathfind():
         connecting = True
 
 
+# after we find the optimal path to the goal, we start at the end and move back towards our start
 def connect():
     global path_count
     path_count += 1
     global current_tile
 
-    current_tile.adjust_color((-255, 255, -255))
+    current_tile.set_color((0, 255, 150))
     current_tile = current_tile.parent
+    current_tile.set_color((255, 255, 0))
+
     if current_tile == t.Tile.start_tile:
         global connecting
         connecting = False
-
 
 
 # program looping until simulation limit is reached or ESC is pressed (while not in sleep)
@@ -205,6 +219,7 @@ while program_looping:
         # displaying the new visuals for pygame
         display()
 
+
         # if we're not searching and not pathfinding the means we are done
         if searching is False and connecting is False:
             running = False
@@ -212,8 +227,8 @@ while program_looping:
             t.Tile.start_tile = t.Tile.goal_tile = None
 
             # printing the data recorded that's recorded into efficiency_data []
-            print '(sim #{}) (checked {}) (distance {}) (stored {})'\
-                .format(simulation_count, check_count, path_count, len(closed_list) + len(open_list))
+            print ('(sim #{}) (checked {}) (distance {}) (stored {})'\
+                .format(simulation_count, check_count, path_count, len(closed_list) + len(open_list)))
 
             efficiency_data.append((check_count, path_count, len(closed_list) + len(open_list)))
 
@@ -228,4 +243,4 @@ while program_looping:
                 Plotter.plot(efficiency_data)
 
             # sleeping for .5 seconds to admire the beauty of the pathfind when it's done
-            time.sleep(.5)
+            time.sleep(0.5)
