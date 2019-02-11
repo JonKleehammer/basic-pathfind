@@ -43,7 +43,15 @@ class Tile:
             else:
                 self.color = (200, 200, 240)
         else:
-            self.color = rgb
+            r = rgb[0]
+            g = rgb[1]
+            b = rgb[2]
+
+            r = numpy.clip(r, 0, 255)
+            g = numpy.clip(g, 0, 255)
+            b = numpy.clip(b, 0, 255)
+
+            self.color = (r, g, b)
 
     # adjust color changes the color relative to the current value (eg (-20, 0, 0) reduces the red value by 20
     def adjust_color(self, rgb):
@@ -57,6 +65,9 @@ class Tile:
         b = numpy.clip(b, 0, 255)
 
         self.color = (r, g, b)
+
+    def get_color(self):
+        return self.color
 
     # setting the tile to start (also sets the color and makes it not an obstacle)
     def set_start(self):

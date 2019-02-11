@@ -151,9 +151,16 @@ def connect():
     path_count += 1
     global current_tile
 
-    current_tile.set_color((0, 255, 150))
+    # when the goal tile is searched it turns blue, we want to change this tile back to yellow
+    if current_tile == t.Tile.goal_tile:
+        current_tile.set_color((255, 255, 0))
+
+
+    # creating a gradient of colors starting from yellow and moving to green
+    lastColor = current_tile.get_color()
     current_tile = current_tile.parent
-    current_tile.set_color((255, 255, 0))
+    current_tile.set_color((lastColor[0] - 10, lastColor[1] + 0, lastColor[2] + 0))
+
 
     if current_tile == t.Tile.start_tile:
         global connecting
